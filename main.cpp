@@ -1,0 +1,50 @@
+#include <iostream>
+#include <mutex>
+#include <list>
+#include "ThreadsManager.h"
+
+typedef struct _Point{
+    _Point(int xx,int yy):x(xx),y(yy){};
+    int x;
+    int y;
+}Point;//要处理的数据的类型定义，我这里是处理点
+
+std::mutex mCout;               //打印互斥锁
+ThreadsManager<Point> *manager; //线程管理器
+
+void callback(int i){
+    while(true){
+        manager->wait();    //有资源的话会立即返回，没有资源会阻塞
+        if(!manager->run()){//是否继续运行子线程
+            break;
+        }
+        //取点
+        Point point = manager->pop();
+
+        //处理数据
+        MSLEEP(i*10);//休眠一段时间,代表处理数据时间
+        mCout.lock();
+        printf("Point(%d,%d)\n",point.x,point.y);
+        mCout.unlock();
+    }
+}
+
+void demo(){
+    manager = new ThreadsManager<Point>(4);
+    manager->create(callback);
+    for(int i=0;i<10;i++){
+        for(int j=0;j<5;j++){
+           manager->add(Point(i,j));
+        }
+    }
+    manager->join();//等待处理完所有points里面的数据
+    manager->kill();//退出线程
+
+    std::cout << "Hello, World!" << std::endl;
+    delete manager;
+}
+
+int main() {
+    demo();
+    return 0;
+}

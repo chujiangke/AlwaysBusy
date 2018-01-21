@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "Semaphore.h"
 
-#define MSLEEP(x) (usleep(x*1000))
+#define MSLEEP(x) (usleep((x*100))) //休眠x*100us
 
 using namespace SEM;
 
@@ -54,8 +54,9 @@ public:
     }
 
     void join() {
+        MSLEEP(10);//休眠500us,等待被唤醒的线程启动
         while (_running != 0){
-            MSLEEP(1);
+            MSLEEP(5);//休眠500us之后再查询有无进程再运行
         }
     }
 

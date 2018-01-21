@@ -22,7 +22,7 @@ void callback(int i){
         Point point = manager->pop();
 
         //处理数据
-        MSLEEP(i*10);//休眠一段时间,代表处理数据时间
+        MSLEEP(i*100);//休眠一段时间,代表处理数据时间
         mCout.lock();
         printf("Point(%d,%d)\n",point.x,point.y);
         mCout.unlock();
@@ -32,12 +32,25 @@ void callback(int i){
 void demo(){
     manager = new ThreadsManager<Point>(4);
     manager->create(callback);
-    for(int i=0;i<10;i++){
+    for(int i=0;i<5;i++){
         for(int j=0;j<5;j++){
            manager->add(Point(i,j));
         }
     }
     manager->join();//等待处理完所有points里面的数据
+    std::cout << "emmm" << std::endl;
+    for(int i=5;i<10;i++){
+        for(int j=5;j<10;j++){
+            manager->add(Point(i,j));
+        }
+    }
+    manager->join();
+    std::cout << "emmmmmm" << std::endl;
+    for(int i=10;i<15;i++){
+        for(int j=10;j<15;j++){
+            manager->add(Point(i,j));
+        }
+    }
     manager->kill();//退出线程
 
     std::cout << "Hello, World!" << std::endl;

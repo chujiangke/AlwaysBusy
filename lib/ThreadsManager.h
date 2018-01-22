@@ -54,9 +54,9 @@ public:
     }
 
     void join() {
-        MSLEEP(10);//休眠500us,等待被唤醒的线程启动
+        MSLEEP(1);//休眠500us,等待被唤醒的线程启动
         while (_running != 0){
-            MSLEEP(5);//休眠500us之后再查询有无进程再运行
+            MSLEEP(1);//休眠500us之后再查询有无进程再运行
         }
     }
 

@@ -2,7 +2,7 @@
 #define ALWAYSBUSY_THREADSMANAGER_H
 
 #include <thread>
-#include <list>
+#include <vector>
 #include <unistd.h>
 #include "Semaphore.h"
 
@@ -10,26 +10,19 @@
 
 using namespace SEM;
 
-template <typename DataType>
+template <typename T>
 class ThreadsManager {
 
-private:
-    int _count;                 //线程数量
-    int _running;               //正在运行的线程数量
-    std::mutex _mutex;          //_running的互斥锁
-    std::thread *threads;       //线程数组指针
-    Semaphore *semaphore;       //信号量
-    bool _run;                  //是否继续运行子线程
-    std::list<DataType> _dataList;      //数据链表
-    std::mutex _mutexDataList;          //数据链表互斥锁
-
 public:
+    typedef typename std::vector<T>::iterator Iterator;
+
     explicit ThreadsManager(int count):threads(nullptr),_run(true) {
         assert(count>0 && count<12);
         _count = count;
         _running = count;
         semaphore = new Semaphore("semaphore",0);
         assert(semaphore != nullptr);
+        _where = 0;
     }
 
     ~ThreadsManager() {
@@ -85,20 +78,56 @@ public:
         }
     }
 
-    void add(DataType data) {
+    void add(T data) {
         _mutexDataList.lock();
-        _dataList.emplace_back(data);
+        _data.emplace_back(data);
         _mutexDataList.unlock();
         signal();
     }
 
-    DataType pop() {
+    T pop() {
         _mutexDataList.lock();
-        DataType data = _dataList.front();   //取出第一个
-        _dataList.pop_front();             //删除第一个
+        T data = _data.front();        //取出第一个
+        _data.erase(_data.begin());    //删除第一个
         _mutexDataList.unlock();
         return data;
     }
+
+    T *next(){
+        T *d = nullptr;
+        _mutexDataList.lock();
+        if(_where < _data.size()){
+            d = &(_data[_where]);
+            _where++;
+        }
+        _mutexDataList.unlock();
+        return d;
+    }
+    void clear(){
+        _mutexDataList.lock();
+        _where = 0;
+        _data.clear();
+        _mutexDataList.unlock();
+    }
+
+    T get(int index){
+        return _data[index];
+    }
+
+    ulong size(){
+        return _data.size();
+    }
+
+private:
+    int             _count;         //线程数量
+    int             _running;       //正在运行的线程数量
+    std::mutex      _mutex;         //_running的互斥锁
+    std::thread     *threads;       //线程数组指针
+    Semaphore       *semaphore;     //信号量
+    bool            _run;           //是否继续运行子线程
+    std::vector<T>  _data;          //数据链表
+    std::mutex      _mutexDataList; //数据链表互斥锁
+    int             _where;
 };
 
 

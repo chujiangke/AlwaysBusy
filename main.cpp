@@ -4,13 +4,14 @@
 #include "ThreadsManager.h"
 
 typedef struct _Point{
-    _Point(int xx,int yy):x(xx),y(yy){};
+    _Point(int xx,int yy):x(xx),y(yy),z(0){};
     int x;
     int y;
+    int z;
 }Position;//要处理的数据的类型定义，我这里是处理点
 
 std::mutex mCout;                   //打印互斥锁
-ThreadsManager<Position> *manager; //线程管理器
+ThreadsManager<Position> *manager;  //线程管理器
 
 /**
  * 在子线程执行的函数模板
@@ -23,13 +24,15 @@ void callback(int i){
             break;
         }
         //取点
-        Position point = manager->pop();
 
         //处理数据，可以自定义的部分
         MSLEEP(i*100);//休眠一段时间,代表处理数据时间
-        mCout.lock();
-        printf("Position(%d,%d)\n",point.x,point.y);
-        mCout.unlock();
+//        mCout.lock();
+        Position *point= manager->next();
+        point->z = point->x + point->y;
+//        printf("Position(%d,%d,%d)\n",point->x,point->y,point->z);
+        point = nullptr;
+//        mCout.unlock();
     }
 }
 
@@ -43,6 +46,11 @@ void demo(){
     }
     manager->join();                    //等待处理完所有points里面的数据
     std::cout << "emmm" << std::endl;
+    for(ulong i=0;i<manager->size();i++){
+        auto p = manager->get(i);
+        printf("(%d %d %d)\n",p.x,p.y,p.z);
+    }
+    manager->clear();//清除旧的数据
     for(int i=5;i<10;i++){              //再次添加点
         for(int j=5;j<10;j++){
             manager->add(Position(i,j));
@@ -50,12 +58,21 @@ void demo(){
     }
     manager->join();                    //等待处理完
     std::cout << "emmmmmm" << std::endl;
+    for(int i=0;i<manager->size();i++){ //打印数据
+        auto p = manager->get(i);
+        printf("(%d %d %d)\n",p.x,p.y,p.z);
+    }
+    manager->clear();//清除旧的数据
     for(int i=10;i<15;i++){             //再次添加数据
         for(int j=10;j<15;j++){
             manager->add(Position(i,j));
         }
     }
     manager->kill();//退出线程
+    for(ulong i=0;i<manager->size();i++){
+        auto p = manager->get(i);
+        printf("(%d %d %d)\n",p.x,p.y,p.z);
+    }
 
     std::cout << "Hello, World!" << std::endl;
     delete manager;

@@ -26,7 +26,7 @@ void callback(int i){
         Position point = manager->pop();
 
         //处理数据，可以自定义的部分
-        MSLEEP(i*100);//休眠一段时间,代表处理数据时间
+        SLEEP(i*100);//休眠一段时间,代表处理数据时间
         mCout.lock();
         printf("Position(%d,%d)\n",point.x,point.y);
         mCout.unlock();

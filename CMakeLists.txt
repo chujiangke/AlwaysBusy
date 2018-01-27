@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(lib)
 
-set(HEADERS lib/Semaphore.h lib/ThreadsManager.h)
+set(HEADERS lib/Semaphore.h lib/ThreadsManager.h lib/tools.h)
 set(SOURCES main.cpp)
 
 add_executable(AlwaysBusy ${HEADERS} ${SOURCES})

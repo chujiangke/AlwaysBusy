@@ -42,14 +42,14 @@ void demo(){
         }
     }
     manager->join();                    //等待处理完所有points里面的数据
-    std::cout << "emmm" << std::endl;
+//    std::cout << "emmm" << std::endl;
     for(int i=5;i<10;i++){              //再次添加点
         for(int j=5;j<10;j++){
             manager->add(Position(i,j));
         }
     }
     manager->join();                    //等待处理完
-    std::cout << "emmmmmm" << std::endl;
+//    std::cout << "emmmmmm" << std::endl;
     for(int i=10;i<15;i++){             //再次添加数据
         for(int j=10;j<15;j++){
             manager->add(Position(i,j));

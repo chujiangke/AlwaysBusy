@@ -14,7 +14,7 @@ ThreadsManager<Position> *manager;  //线程管理器
 
 /**
  * 在子线程执行的函数模板
- * @param i 子线程的的id，范围是1~n
+ * @param i 子线程的的id，范围是0~n-1
  */
 void callback(int i){
     while(true){

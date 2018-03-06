@@ -10,7 +10,7 @@ typedef struct _Point{
 }Position;//要处理的数据的类型定义，我这里是处理点
 
 std::mutex mCout;                   //打印互斥锁
-ThreadsManager<Position> *manager; //线程管理器
+ThreadsManager<Position> *manager;  //线程管理器
 
 /**
  * 在子线程执行的函数模板
@@ -22,7 +22,7 @@ void callback(int i){
         if(!manager->run()){//是否继续运行子线程
             break;
         }
-        //取点
+        //取数据
         Position point = manager->pop();
 
         //处理数据，可以自定义的部分
@@ -36,26 +36,28 @@ void callback(int i){
 void demo(){
     manager = new ThreadsManager<Position>(4);  //新建线程管理对象
     manager->create(callback);                  //创建线程
-    for(int i=0;i<5;i++){                       //添加点
+    for(int i=0;i<5;i++){
         for(int j=0;j<5;j++){
-           manager->add(Position(i,j));
+           manager->add(Position(i,j));         //添加待处理数据
         }
     }
-    manager->join();                    //等待处理完所有points里面的数据
+    manager->join();                    //等待处理完所有数据
+
 //    std::cout << "emmm" << std::endl;
-    for(int i=5;i<10;i++){              //再次添加点
+    for(int i=5;i<10;i++){              //再次添加数据
         for(int j=5;j<10;j++){
             manager->add(Position(i,j));
         }
     }
-    manager->join();                    //等待处理完
+    manager->join();                    //等待处理完所有数据
+
 //    std::cout << "emmmmmm" << std::endl;
     for(int i=10;i<15;i++){             //再次添加数据
         for(int j=10;j<15;j++){
             manager->add(Position(i,j));
         }
     }
-    manager->kill();//退出线程
+    manager->kill();//杀死所有子线程
 
     std::cout << "Hello, World!" << std::endl;
     delete manager;

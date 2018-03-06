@@ -34,30 +34,36 @@ void callback(int i){
 }
 
 void demo(){
-    manager = new ThreadsManager<Position>(4);  //新建线程管理对象
-    manager->create(callback);                  //创建线程
+    //新建线程管理对象
+    manager = new ThreadsManager<Position>(4);
+    //创建线程
+    manager->create(callback);
+    //添加待处理数据
     for(int i=0;i<5;i++){
         for(int j=0;j<5;j++){
-           manager->add(Position(i,j));         //添加待处理数据
+           manager->add(Position(i,j));
         }
     }
-    manager->join();                    //等待处理完所有数据
+    //等待处理完所有数据
+    manager->join();
 
-//    std::cout << "emmm" << std::endl;
-    for(int i=5;i<10;i++){              //再次添加数据
+    std::cout << "第二次添加数据" << std::endl;
+    for(int i=5;i<10;i++){
         for(int j=5;j<10;j++){
             manager->add(Position(i,j));
         }
     }
-    manager->join();                    //等待处理完所有数据
+    //等待处理完所有数据
+    manager->join();
 
-//    std::cout << "emmmmmm" << std::endl;
-    for(int i=10;i<15;i++){             //再次添加数据
+    std::cout << "第三次添加数据" << std::endl;
+    for(int i=10;i<15;i++){
         for(int j=10;j<15;j++){
             manager->add(Position(i,j));
         }
     }
-    manager->kill();//杀死所有子线程
+    //杀死所有子线程
+    manager->kill();
 
     std::cout << "Hello, World!" << std::endl;
     delete manager;

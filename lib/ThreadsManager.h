@@ -28,7 +28,7 @@ private:
     bool _run;                  //是否继续运行子线程
     std::list<DataType> _dataList;      //数据链表
     std::mutex _mutexDataList;          //数据链表互斥锁
-    long _coreCount;             //CPU核心数量
+    int _coreCount;             //CPU核心数量
 
 public:
     /**
@@ -141,20 +141,19 @@ public:
         return data;
     }
 
-private:
     /**
      * 获取CPU逻辑核心数量
      * @return 核心数量
      */
-    long getCoreCount()
+    static int getCoreCount()
     {
-        long count = 1; // 至少一个
+        int count = 1; // 至少一个
 #ifdef _WIN32
         SYSTEM_INFO si;
         GetSystemInfo(&si);
         count = si.dwNumberOfProcessors;
 #else
-        count = sysconf(_SC_NPROCESSORS_CONF);
+        count = static_cast<int>(sysconf(_SC_NPROCESSORS_CONF));
 #endif
         return count;
     }

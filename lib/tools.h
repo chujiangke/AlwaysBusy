@@ -5,9 +5,9 @@
 #include <iostream>
 #include <string>
 
-#define ASSERT(condition,error_message) ((condition)?0:assertion(__FILE__, __func__, __LINE__,error_message))
+#define ASSERT(condition,error_message) ((condition)?0:(assertion(__FILE__, __func__, __LINE__,error_message),-1))
 
-inline int assertion(std::string filePath, std::string function,int line, std::string info){
+inline void assertion(std::string filePath, std::string function,int line, std::string info){
     //获取文件名
     unsigned long pos=filePath.find_last_of('/');
     std::string filename(filePath.substr(pos+1));

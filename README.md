@@ -75,3 +75,12 @@ delete manager;
 
 ## 四、问题反馈
 在使用中有任何问题，欢迎开issue
+
+## 五、关于作者
+```javascript
+  var whoAmI = {
+    name   : "Mannix1994",
+    gitee  : "https://gitee.com/Mannix1994",
+    github : "https://github.com/Mannix1994"
+  }
+```

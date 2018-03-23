@@ -1,75 +1,72 @@
 #include <iostream>
 #include <mutex>
 #include <list>
-#include "ThreadsManager.h"
+#include <thread>
 
-typedef struct _Point{
-    _Point(int xx,int yy):x(xx),y(yy){};
+using namespace std;
+
+class Position {
+public:
+    Position(int xx, int yy) : x(xx), y(yy) {};
     int x;
     int y;
-}Position;//要处理的数据的类型定义，我这里是处理点
 
-std::mutex mCout;                   //打印互斥锁
-ThreadsManager<Position> *manager;  //线程管理器
-
-/**
- * 在子线程执行的函数模板
- * @param i 子线程的的id，范围是0~n-1
- */
-void callback(int i){
-    while(true){
-        manager->wait();    //有资源的话会立即返回，没有资源会阻塞
-        if(!manager->run()){//是否继续运行子线程
-            break;
-        }
-        //取数据
-        Position point = manager->pop();
-
-        //处理数据，可以自定义的部分
-        SLEEP(i*100);//休眠一段时间,代表处理数据时间
-        mCout.lock();
-        printf("Position(%d,%d)\n",point.x,point.y);
-        mCout.unlock();
+    void member(int i) {
+        printf("member:%d\n", i);
+        x = 100;
     }
+
+    friend void pointer(Position *p, int i);
+    friend void reference(Position &p, int i);
+};
+
+void pointer(Position *p, int i) {
+    printf("pointer:%d(%d,%d)\n", i, p->x, p->y);
+    p->x = 200;
 }
 
-void demo(){
-    //新建线程管理对象
-    manager = new ThreadsManager<Position>(4);
-    //创建线程
-    manager->create(callback);
-    //添加待处理数据
-    for(int i=0;i<5;i++){
-        for(int j=0;j<5;j++){
-           manager->add(Position(i,j));
-        }
-    }
-    //等待处理完所有数据
-    manager->join();
-
-    std::cout << "第二次添加数据" << std::endl;
-    for(int i=5;i<10;i++){
-        for(int j=5;j<10;j++){
-            manager->add(Position(i,j));
-        }
-    }
-    //等待处理完所有数据
-    manager->join();
-
-    std::cout << "第三次添加数据" << std::endl;
-    for(int i=10;i<15;i++){
-        for(int j=10;j<15;j++){
-            manager->add(Position(i,j));
-        }
-    }
-    //杀死所有子线程
-    manager->kill();
-
-    std::cout << "Hello, World!" << std::endl;
-    delete manager;
+void reference(Position &p, int i) {
+    printf("reference:%d(%d,%d)\n", i, p.x, p.y);
+    p.x = 300;
 }
 
 int main() {
-    demo();
+    Position p(1, 2);
+
+    //使用类的成员函数作为子线程的参数
+    //参数说明：//参数1是成员函数的指针，参数2是Position对象
+    //值传递,子线程中对p的修改不会影响主线程中的对象p。
+    thread t1(&Position::member, p, 233);
+    t1.join();
+    cout << "p.x=" << p.x << endl;
+
+    //使用类的友元函数作为参数
+    //友元函数参见：https://blog.csdn.net/mary19920410/article/details/70036878
+    //参数说明：参数1是Position的友元函数reference，参数2是用ref包装过的引用，参数3是传给reference的值。
+    //在这种方式中，由于p是以引用的方式传递给子线程，在子线程中对p的修改相当于修改主线程中的p。
+    std::thread t2(reference, ref(p), 1);
+    t2.join();
+    cout << "p.x=" << p.x << endl;
+
+    //使用类的友元函数作为参数
+    //参数说明：参数1是Position的友元函数pointer，参数2是p的指针，参数3是传给pointer的参数。
+    //在这种方式中，由于p是以引用的方式传递给子线程，在子线程中对p的修改相当于修改主线程中的p。
+    std::thread t3(pointer, &p, 1);
+    t3.join();
+    cout << "p.x=" << p.x << endl;
+
+    //通过lambda传递引用参数
+    //关于lambda函数的说明:https://blog.csdn.net/u010984552/article/details/53634513
+    auto lambda_func = [&p](int i) -> void {
+        printf("lambda_func:%d(%d,%d)\n", i, p.x, p.y);
+        p.x = 400;
+    };
+    //参数说明：参数1是lambda表达式,参数2是传递给lambda函数的参数
+    //由于在lambda_func是以引用的方式捕获p，所以在子线程中p是主线程中p的引用，在子线程中修改p
+    //相当于主线程中的p。
+    thread t4(lambda_func, 123);
+    t4.join();
+    cout << "p.x=" << p.x << endl;
+
     return 0;
 }

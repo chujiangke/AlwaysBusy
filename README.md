@@ -24,12 +24,12 @@ typedef struct _Point{
 3. 在代码中包含头文件ThreadsManager.h并声明一个指针
 ```cplusplus
 #include "ThreadsManager.h"
-//声明一个指针
 std::mutex mCout;  //打印互斥锁，不是必须设置的变量
+//声明一个指针
 ThreadsManager<Position> *manager;  //线程管理器
 ```
 
-4. 声明一个在子线程执行的回调函数，必须按照下面的结构来写
+4. 声明一个在子线程执行的函数，必须按照下面的结构来写
 ```cplusplus
 /**
  * 在子线程执行的函数模板

@@ -17,17 +17,17 @@ public:
     typedef typename std::vector<T>::iterator Iterator;
 
     explicit ThreadsManager(int count):_run(true) {
-        assert(count>0 && count<12);
+        assert(count>0 && count<getCoreCount());
         _count = count;
         _running = count;
-        semaphore = new Semaphore("semaphore",0);
-        assert(semaphore != nullptr);
+        _semaphore = new Semaphore("_semaphore",0);
+        assert(_semaphore != nullptr);
         _where = 0;
     }
 
     ~ThreadsManager() {
-        if(semaphore != nullptr)
-            delete semaphore;
+        if(_semaphore != nullptr)
+            delete _semaphore;
     }
 
     bool create(void (*f)(int)) {
@@ -52,20 +52,20 @@ public:
         _mutex.lock();
         _running--;
         _mutex.unlock();
-        semaphore->wait();
+        _semaphore->wait();
         _mutex.lock();
         _running++;
         _mutex.unlock();
     }
 
     void signal() {
-        semaphore->signal();
+        _semaphore->signal();
     }
 
     void kill() {
         join();
         _run = false;
-        semaphore->signalAll();
+        _semaphore->signalAll();
         for (int i=0;i<_count;i++){
             threads[i].join();//等待所有线程退出
         }
@@ -111,12 +111,29 @@ public:
         return _data.size();
     }
 
+    /**
+     * 获取CPU逻辑核心数量
+     * @return 核心数量
+     */
+    static int getCoreCount()
+    {
+        int count = 1; // 至少一个
+#ifdef _WIN32
+        SYSTEM_INFO si;
+        GetSystemInfo(&si);
+        count = si.dwNumberOfProcessors;
+#else
+        count = static_cast<int>(sysconf(_SC_NPROCESSORS_CONF));
+#endif
+        return count;
+    }
+
 private:
     int                         _count;         //线程数量
     int                         _running;       //正在运行的线程数量
     std::mutex                  _mutex;         //_running的互斥锁
-    std::vector<std::thread>    threads;       //线程数组指针
-    Semaphore                   *semaphore;     //信号量
+    std::vector<std::thread>    threads;        //线程数组指针
+    Semaphore                   *_semaphore;    //信号量
     bool                        _run;           //是否继续运行子线程
     std::vector<T>              _data;          //数据链表
     std::mutex                  _mutexDataList; //数据链表互斥锁

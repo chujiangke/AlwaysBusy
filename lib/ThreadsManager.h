@@ -16,7 +16,7 @@ class ThreadsManager {
 public:
     typedef typename std::vector<T>::iterator Iterator;
 
-    explicit ThreadsManager(int count):threads(nullptr),_run(true) {
+    explicit ThreadsManager(int count):_run(true) {
         assert(count>0 && count<12);
         _count = count;
         _running = count;
@@ -26,20 +26,13 @@ public:
     }
 
     ~ThreadsManager() {
-        if(threads != nullptr)
-            delete[] threads;
         if(semaphore != nullptr)
             delete semaphore;
     }
 
     bool create(void (*f)(int)) {
-        threads = new std::thread[_count];
-        if(threads == nullptr){
-            std::cout<<"Failed to create threads"<<std::endl;
-            exit(-1);
-        }
         for (int i=0;i<_count;i++){
-            threads[i] = std::thread(f,i);
+            threads.push_back(std::thread(f,i));
         }
         return false;
     }
@@ -119,15 +112,15 @@ public:
     }
 
 private:
-    int             _count;         //线程数量
-    int             _running;       //正在运行的线程数量
-    std::mutex      _mutex;         //_running的互斥锁
-    std::thread     *threads;       //线程数组指针
-    Semaphore       *semaphore;     //信号量
-    bool            _run;           //是否继续运行子线程
-    std::vector<T>  _data;          //数据链表
-    std::mutex      _mutexDataList; //数据链表互斥锁
-    int             _where;
+    int                         _count;         //线程数量
+    int                         _running;       //正在运行的线程数量
+    std::mutex                  _mutex;         //_running的互斥锁
+    std::vector<std::thread>    threads;       //线程数组指针
+    Semaphore                   *semaphore;     //信号量
+    bool                        _run;           //是否继续运行子线程
+    std::vector<T>              _data;          //数据链表
+    std::mutex                  _mutexDataList; //数据链表互斥锁
+    int                         _where;
 };
 
 

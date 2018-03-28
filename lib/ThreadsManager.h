@@ -7,8 +7,14 @@
 
 #include "Semaphore.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#define SLEEP(x)  (Sleep(x)) //休眠xms
+#else
 #include <unistd.h>
-#define MSLEEP(x) (usleep((x*100))) //休眠x*100us
+
+#define SLEEP(x) (usleep((x*100))) //休眠x*100us
+#endif
 
 using namespace SEM;
 
@@ -59,9 +65,9 @@ public:
      * 等待所有子线程阻塞
      */
     void join() {
-        MSLEEP(5);//休眠500us,等待被唤醒的线程启动
+        SLEEP(5);//休眠500us,等待被唤醒的线程启动
         while (_running_thread != 0){
-            MSLEEP(1);//休眠500us之后再查询有无进程再运行
+            SLEEP(1);//休眠500us之后再查询有无进程再运行
         }
     }
 

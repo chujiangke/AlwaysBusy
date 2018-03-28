@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <list>
+#include <vector>
 #include "Semaphore.h"
 #include "tools.h"
 
@@ -11,6 +12,7 @@
 #define SLEEP(x)  (Sleep(x)) //休眠xms
 #else
 #include <unistd.h>
+
 #define SLEEP(x) (usleep((x*100))) //休眠x*100us
 #endif
 
@@ -20,22 +22,22 @@ template <typename DataType>
 class ThreadsManager {
 
 private:
-    int _count;                 //线程数量
-    int _running;               //正在运行的线程数量
-    std::mutex _mutex;          //_running的互斥锁
-    std::thread *threads;       //线程数组指针
-    Semaphore *semaphore;       //信号量
-    bool _run;                  //是否继续运行子线程
+    int _count;                         //线程数量
+    int _running;                       //正在运行的线程数量
+    std::mutex _mutex;                  //_running的互斥锁
+    std::vector<std::thread> threads;   //线程数组指针
+    Semaphore *semaphore;               //信号量
+    bool _run;                          //是否继续运行子线程
     std::list<DataType> _dataList;      //数据链表
     std::mutex _mutexDataList;          //数据链表互斥锁
-    int _coreCount;             //CPU核心数量
+    int _coreCount;                     //CPU核心数量
 
 public:
     /**
      * 构造函数，获取逻辑核心数量和新建用来管理资源的信号量
      * @param count 线程数量
      */
-    explicit ThreadsManager(int count):threads(nullptr),_run(true) {
+    explicit ThreadsManager(int count):_run(true) {
         _coreCount = getCoreCount();
         ASSERT(count>0 && count<_coreCount,"线程数量不正确");//
         _count = count;
@@ -45,8 +47,6 @@ public:
     }
 
     ~ThreadsManager() {
-        if(threads != nullptr)
-            delete[] threads;
         if(semaphore != nullptr)
             delete semaphore;
     }
@@ -57,13 +57,8 @@ public:
      * @return 没啥用
      */
     bool create(void (*f)(int)) {
-        threads = new std::thread[_count];
-        if(threads == nullptr){
-            std::cout<<"Failed to create threads"<<std::endl;
-            exit(-1);
-        }
         for (int i=0;i<_count;i++){
-            threads[i] = std::thread(f,i);
+            threads.push_back(std::thread(f,i));
         }
         return true;
     }

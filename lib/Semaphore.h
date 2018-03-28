@@ -26,7 +26,7 @@ namespace SEM {
          */
         void wait() {
             std::unique_lock<std::mutex> lock(_mutex);
-            //std::cout<<_name+":"<<_count<<std::endl;
+            //std::cout<<_name+":"<<_max_thread_count<<std::endl;
             if (--_count < 0) { // 资源不够
                 _condition.wait(lock); // 阻塞
             }
@@ -41,7 +41,7 @@ namespace SEM {
         void wait(int ms) {
             assert(ms > 0);
             std::unique_lock<std::mutex> lock(_mutex);
-            //std::cout<<_name+":"<<_count<<std::endl;
+            //std::cout<<_name+":"<<_max_thread_count<<std::endl;
             if (--_count < 0) {                            // 资源不够
                 std::cv_status status
                         = _condition.wait_for(lock, std::chrono::milliseconds(ms));
@@ -94,7 +94,7 @@ namespace SEM {
     };
 
     std::ostream &operator<<(std::ostream &out, Semaphore &sem) {
-        out<<"Semaphore:"<<sem._name<<",Waiting threads count:"<<sem._count<<std::endl;
+        out<<"Semaphore:"<<sem._name<<",Waiting _threads count:"<<sem._count<<std::endl;
         return out;
     }
 };

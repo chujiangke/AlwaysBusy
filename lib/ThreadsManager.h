@@ -40,6 +40,7 @@ public:
     ~ThreadsManager() {
         if(_semaphore != nullptr)
             delete _semaphore;
+        _data_vector.clear();
     }
 
     /**
@@ -108,9 +109,9 @@ public:
      * @param data 数据
      */
     void add(T data) {
-        _mutexDataList.lock();
-        _data.emplace_back(data);
-        _mutexDataList.unlock();
+        _mutex_data_vector.lock();
+        _data_vector.emplace_back(data);
+        _mutex_data_vector.unlock();
         signal();
     }
 
@@ -119,10 +120,10 @@ public:
      * @return  数据
      */
     T pop() {
-        _mutexDataList.lock();
-        T data = _data.front();        //取出第一个
-        _data.erase(_data.begin());    //删除第一个
-        _mutexDataList.unlock();
+        _mutex_data_vector.lock();
+        T data = _data_vector.front();        //取出第一个
+        _data_vector.erase(_data_vector.begin());    //删除第一个
+        _mutex_data_vector.unlock();
         return data;
     }
 
@@ -132,22 +133,22 @@ public:
      */
     T *next(){
         T *d = nullptr;
-        _mutexDataList.lock();
-        if(_data_pointer < _data.size()){
-            d = &(_data[_data_pointer]);
+        _mutex_data_vector.lock();
+        if(_data_pointer < _data_vector.size()){
+            d = &(_data_vector[_data_pointer]);
             _data_pointer++;
         }
-        _mutexDataList.unlock();
+        _mutex_data_vector.unlock();
         return d;
     }
     /**
      * 清空数据链表
      */
     void clear(){
-        _mutexDataList.lock();
+        _mutex_data_vector.lock();
         _data_pointer = 0;
-        _data.clear();
-        _mutexDataList.unlock();
+        _data_vector.clear();
+        _mutex_data_vector.unlock();
     }
 
     /**
@@ -156,8 +157,8 @@ public:
      * @return
      */
     T get(int index){
-        if(index<_data.size())
-            return _data[index];
+        if(index<_data_vector.size())
+            return _data_vector[index];
         else
             throw std::out_of_range("index is out of range");
     }
@@ -167,7 +168,7 @@ public:
      * @return 大于0整数
      */
     ulong size(){
-        return _data.size();
+        return _data_vector.size();
     }
 
     /**
@@ -188,15 +189,15 @@ public:
     }
 
 private:
-    int                         _max_thread_count;         //线程数量
-    int                         _running_thread;       //正在运行的线程数量
-    std::mutex                  _mutex;         //_running的互斥锁
-    std::vector<std::thread>    _threads;        //线程数组指针
-    Semaphore                   *_semaphore;    //信号量
-    bool                        _run_or_not;           //是否继续运行子线程
-    std::vector<T>              _data;          //数据链表
-    std::mutex                  _mutexDataList; //数据链表互斥锁
-    int                         _data_pointer;
+    int                         _max_thread_count;  //线程数量
+    int                         _running_thread;    //正在运行的线程数量
+    std::mutex                  _mutex;             //_running的互斥锁
+    std::vector<std::thread>    _threads;           //线程数组容器
+    Semaphore                   *_semaphore;        //同步线程的信号量
+    bool                        _run_or_not;        //是否继续运行子线程
+    std::vector<T>              _data_vector;       //数据向量
+    std::mutex                  _mutex_data_vector; //数据向量互斥锁
+    int                         _data_pointer;      //下一个访问的数据位置
 };
 
 

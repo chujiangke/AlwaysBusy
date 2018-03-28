@@ -1,75 +1,61 @@
 #include <iostream>
 #include <mutex>
 #include <list>
-#include "ThreadsManager.h"
+#include <random>
+#include "Semaphore.h"
+#include <unistd.h>
+#include <thread>
 
-typedef struct _Point{
-    _Point(int xx,int yy):x(xx),y(yy){};
-    int x;
-    int y;
-}Position;//要处理的数据的类型定义，我这里是处理点
+using namespace std;
 
-std::mutex mCout;                   //打印互斥锁
-ThreadsManager<Position> *manager;  //线程管理器
+class Goods{
+public:
+    explicit Goods(int ii):i(ii){
+    }
+    int i;
+};//产品
 
-/**
- * 在子线程执行的函数模板
- * @param i 子线程的的id，范围是0~n-1
- */
-void callback(int i){
-    while(true){
-        manager->wait();    //有资源的话会立即返回，没有资源会阻塞
-        if(!manager->run()){//是否继续运行子线程
-            break;
-        }
-        //取数据
-        Position point = manager->pop();
+SEM::Semaphore *g_sem;
 
-        //处理数据，可以自定义的部分
-        SLEEP(i*100);//休眠一段时间,代表处理数据时间
-        mCout.lock();
-        printf("Position(%d,%d)\n",point.x,point.y);
-        mCout.unlock();
+list<Goods> g_goods;//商品货架
+
+mutex g_mutex;
+
+void producer(){
+    default_random_engine e(static_cast<unsigned long>(time(0)));
+    uniform_int_distribution<unsigned> u(0, 10);
+    int i=0;
+    while (++i<5) {
+        //休眠一段随机时间,代表生产过程
+        sleep(u(e));
+        //生产
+        g_mutex.lock();
+        Goods good(u(e));
+        g_goods.emplace_back(good);
+        cout<<"生产产品:"<<good.i<<endl;
+        g_sem->signal();
+        g_mutex.unlock();
     }
 }
 
-void demo(){
-    //新建线程管理对象
-    manager = new ThreadsManager<Position>(4);
-    //创建线程
-    manager->create(callback);
-    //添加待处理数据
-    for(int i=0;i<5;i++){
-        for(int j=0;j<5;j++){
-           manager->add(Position(i,j));
-        }
+void costumer(){
+    int i=0;
+    while (++i<5) {
+        g_sem->wait();//有资源会立即返回,没有资源则会等待
+        //消费
+        g_mutex.lock();
+        Goods good = g_goods.front();
+        cout<<"消费产品:"<<good.i<<endl;
+        g_goods.pop_front();
+        g_mutex.unlock();
     }
-    //等待处理完所有数据
-    manager->join();
-
-    std::cout << "第二次添加数据" << std::endl;
-    for(int i=5;i<10;i++){
-        for(int j=5;j<10;j++){
-            manager->add(Position(i,j));
-        }
-    }
-    //等待处理完所有数据
-    manager->join();
-
-    std::cout << "第三次添加数据" << std::endl;
-    for(int i=10;i<15;i++){
-        for(int j=10;j<15;j++){
-            manager->add(Position(i,j));
-        }
-    }
-    //杀死所有子线程
-    manager->kill();
-
-    std::cout << "Hello, World!" << std::endl;
-    delete manager;
 }
-
 int main() {
-    demo();
+    g_sem = new SEM::Semaphore("sem_name",0);
+    thread producer_t(producer);
+    thread costumer_t(costumer);
+    producer_t.join();
+    costumer_t.join();
+    delete g_sem;
     return 0;
 }

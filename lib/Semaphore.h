@@ -17,8 +17,8 @@ namespace SEM {
         std::string _name;                      //信号量名字
 
     public:
-        explicit Semaphore(std::string name, int value = 0) :
-                _name(std::move(name)), _count(value) {}
+        explicit Semaphore(std::string name, int count = 0) :
+                _name(std::move(name)), _count(count) {}
 
         /**
          * 阻塞一个线程，相当于信号量机制里面的P操作

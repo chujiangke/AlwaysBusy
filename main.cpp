@@ -32,7 +32,7 @@ void callback(int i){
         Point *point= manager->next();
         point->z = point->x + point->y;
 //        printf("Position(%d,%d,%d)\n",point->x,point->y,point->z);
-        point = nullptr;
+//        point = nullptr;
 //        mCout.unlock();
     }
 }

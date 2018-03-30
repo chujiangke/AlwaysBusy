@@ -6,6 +6,7 @@
 class Point{
 public:
     Point(int xx,int yy):x(xx),y(yy),z(0){};
+    int index = 0;
     int x;
     int y;
     int z;
@@ -29,9 +30,10 @@ void callback(int i){
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
 //        mCout.lock();
-        Point *point= manager->next();
-        point->z = point->x + point->y;
-//        printf("Position(%d,%d,%d)\n",point->x,point->y,point->z);
+        Point point= manager->next();
+        point.z = point.x + point.y;
+        manager->set(point);
+//        printf("Position:%d(%d,%d,%d)\n",point.index,point.x,point.y,point.z);
 //        point = nullptr;
 //        mCout.unlock();
     }

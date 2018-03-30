@@ -16,7 +16,10 @@
 #define SLEEP(x) (usleep((x*100))) //休眠x*100us
 #endif
 
-using namespace SEM;
+class DataBase{
+public:
+    int index = 0;
+};
 
 template <typename T>
 class ThreadsManager {
@@ -32,7 +35,7 @@ public:
         assert(count>0 && count<getCoreCount());
         _max_thread_count = count;
         _running_thread = count;
-        _semaphore = new Semaphore("_semaphore",0);
+        _semaphore = new SEM::Semaphore("_semaphore",0);
         assert(_semaphore != nullptr);
         _data_pointer = 0;
     }
@@ -131,15 +134,17 @@ public:
      * 返回链表中的下一个数据
      * @return 数据
      */
-    T *next(){
-        T *d = nullptr;
+    T next(){
+        int index=0;
         _mutex_data_vector.lock();
         if(_data_pointer < _data_vector.size()){
-            d = &(_data_vector[_data_pointer]);
+            index = _data_pointer;
             _data_pointer++;
         }
         _mutex_data_vector.unlock();
-        return d;
+        T data = _data_vector[index];
+        data.index = index;
+        return data;
     }
     /**
      * 清空数据链表
@@ -159,6 +164,13 @@ public:
     T get(int index){
         if(index<_data_vector.size())
             return _data_vector[index];
+        else
+            throw std::out_of_range("index is out of range");
+    }
+
+    void set(T data){
+        if(data.index<_data_vector.size())
+            _data_vector[data.index] = data;
         else
             throw std::out_of_range("index is out of range");
     }
@@ -193,7 +205,7 @@ private:
     int                         _running_thread;    //正在运行的线程数量
     std::mutex                  _mutex;             //_running的互斥锁
     std::vector<std::thread>    _threads;           //线程数组容器
-    Semaphore                   *_semaphore;        //同步线程的信号量
+    SEM::Semaphore              *_semaphore;        //同步线程的信号量
     bool                        _run_or_not;        //是否继续运行子线程
     std::vector<T>              _data_vector;       //数据向量
     std::mutex                  _mutex_data_vector; //数据向量互斥锁

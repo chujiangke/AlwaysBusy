@@ -8,7 +8,7 @@
  * @param name
  */
 void init(Semaphore *sem,char name[], unsigned value) {
-    memcpy(sem->_name, name, strlen(name) + 1);
+    strcpy(sem->_name,name);
     sem_init(&(sem->_sem), 0, value);
 }
 
@@ -57,8 +57,8 @@ void signalAll(Semaphore *sem) {
  * 返回这个信号量的名字
  * @return 名字
  */
-char *name(Semaphore *sem) {
-    return sem->_name;
+void name(Semaphore *sem,char name[]) {
+    strcpy(name,sem->_name);
 }
 
 /**
@@ -69,6 +69,7 @@ void destroy(Semaphore *sem) {
 }
 
 void initSemaphore(Semaphore *sem) {
+    sem->this = sem;
     sem->init = init;
     sem->wait = wait;
     sem->wait_time = wait_time;

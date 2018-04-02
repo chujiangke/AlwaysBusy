@@ -5,7 +5,7 @@ set(CMAKE_C_COMPILER gcc)
 
 include_directories(lib)
 
-set(HEADERS lib/Semaphore.h lib/tools.h)
+set(HEADERS lib/Semaphore.h)
 set(SOURCES main.c lib/Semaphore.c)
 
 add_executable(AlwaysBusy ${HEADERS} ${SOURCES})

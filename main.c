@@ -5,10 +5,10 @@
 #include <stdio.h>
 
 struct Goods{
-    int i;
+    int id;
 };//产品
 
-Semaphore g_sem;
+Semaphore *g_sem;
 
 struct Goods g_goods;//商品货架
 
@@ -22,9 +22,9 @@ void *producer(void *arg){
         sleep((unsigned)rand()%3+1);
         //生产
         pthread_mutex_lock(&g_mutex);
-        g_goods.i = rand()%1000;
-        printf("生产产品:%d\n",g_goods.i);
-        g_sem.signal(g_sem.this);
+        g_goods.id = rand()%1000;
+        printf("生产产品:%d\n",g_goods.id);
+        g_sem->signal(g_sem->this);
         pthread_mutex_unlock(&g_mutex);
     }
 }
@@ -33,22 +33,24 @@ void *costumer(void *arg){
     int i=0;
     int id = *((int *)arg);
     while (++i<5) {
-        g_sem.wait(g_sem.this);//有资源会立即返回,没有资源则会等待
+        g_sem->wait(g_sem->this);//有资源会立即返回,没有资源则会等待
         //消费
         pthread_mutex_lock(&g_mutex);
-        printf("消费者%d消费产品:%d\n",id,g_goods.i);
+        printf("消费者%d消费产品:%d\n",id,g_goods.id);
         pthread_mutex_unlock(&g_mutex);
     }
 }
 int main() {
-    initSemaphore(&g_sem);
-    g_sem.init(g_sem.this,"sem", 0);
+    g_sem = getSemaphore();
+    g_sem->init(g_sem->this,"sem", 0);
     srand((unsigned)time(NULL));
     pthread_mutex_init(&g_mutex,NULL);
 
     pthread_t producer_t;
     pthread_t costumer_t[5];
+
     pthread_create(&producer_t,NULL,producer,NULL);
+
     for(int i=0;i<5;i++){
         pthread_t p;
         costumer_t[i] = p;
@@ -62,6 +64,6 @@ int main() {
     }
 
     pthread_mutex_destroy(&g_mutex);
-    g_sem.destroy(g_sem.this);
+    g_sem->destroy(g_sem->this);
     return 0;
 }

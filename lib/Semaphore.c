@@ -1,6 +1,7 @@
 #include <string.h>
 #include <time.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include "Semaphore.h"
 
 /**
@@ -66,9 +67,16 @@ void name(Semaphore *sem,char name[]) {
  */
 void destroy(Semaphore *sem) {
     sem_destroy(&(sem->_sem));
+    free(sem);
+    sem = NULL;
 }
 
 void initSemaphore(Semaphore *sem) {
+    sem = (Semaphore *)malloc(sizeof(Semaphore));
+    if(sem == NULL){
+        printf("申请内存失败，正在退出");
+        exit(-1);
+    }
     sem->this = sem;
     sem->init = init;
     sem->wait = wait;
@@ -77,4 +85,23 @@ void initSemaphore(Semaphore *sem) {
     sem->signalAll = signalAll;
     sem->name = name;
     sem->destroy = destroy;
+}
+
+Semaphore *getSemaphore() {
+    Semaphore *sem;
+    sem = (Semaphore *)malloc(sizeof(Semaphore));
+    if(sem == NULL){
+        printf("申请内存失败，正在退出");
+        exit(-1);
+    }
+    sem->this = sem;
+    sem->init = init;
+    sem->wait = wait;
+    sem->wait_time = wait_time;
+    sem->signal = signal;
+    sem->signalAll = signalAll;
+    sem->name = name;
+    sem->destroy = destroy;
+
+    return sem;
 }

@@ -15,3 +15,4 @@ typedef struct Semaphore {
 }Semaphore;
 
 void initSemaphore(Semaphore *sem);
+Semaphore *getSemaphore();

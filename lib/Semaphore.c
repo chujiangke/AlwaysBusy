@@ -71,12 +71,11 @@ void destroy(Semaphore *sem) {
     sem = NULL;
 }
 
+/**
+ * 初始化信号量结构体
+ * @param sem 指向信号量的指针
+ */
 void initSemaphore(Semaphore *sem) {
-    sem = (Semaphore *)malloc(sizeof(Semaphore));
-    if(sem == NULL){
-        printf("申请内存失败，正在退出");
-        exit(-1);
-    }
     sem->this = sem;
     sem->init = init;
     sem->wait = wait;
@@ -87,6 +86,10 @@ void initSemaphore(Semaphore *sem) {
     sem->destroy = destroy;
 }
 
+/**
+ * 初始化信号量
+ * @return 返回指向一个信号量的指针
+ */
 Semaphore *getSemaphore() {
     Semaphore *sem;
     sem = (Semaphore *)malloc(sizeof(Semaphore));

@@ -10,9 +10,9 @@ using namespace std;
 
 class Goods{
 public:
-    explicit Goods(int ii):i(ii){
+    explicit Goods(int ii):id(ii){
     }
-    int i;
+    int id;
 };//产品
 
 SEM::Semaphore *g_sem;
@@ -32,9 +32,10 @@ void producer(){
         g_mutex.lock();
         Goods good(u(e));
         g_goods.emplace_back(good);
-        cout<<"生产产品:"<<good.i<<endl;
-        g_sem->signal();
+        cout<<"生产产品:"<<good.id<<endl;
         g_mutex.unlock();
+        //唤醒一个阻塞的消费者
+        g_sem->signal();
     }
 }
 
@@ -45,7 +46,7 @@ void costumer(){
         //消费
         g_mutex.lock();
         Goods good = g_goods.front();
-        cout<<"消费产品:"<<good.i<<endl;
+        cout<<"消费产品:"<<good.id<<endl;
         g_goods.pop_front();
         g_mutex.unlock();
     }

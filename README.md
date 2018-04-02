@@ -14,6 +14,7 @@ Semaphore *g_sem;
 int main(){
     ...
     g_sem = getSemaphore();//得到一个信号量
+    g_sem->init(g_sem->this,"sem", 0);//初始化信号量
     ...
     g_sem->destroy();//使用完成之后要销毁这个信号量
 }
@@ -28,6 +29,7 @@ Semaphore g_sem;
 int main(){
     ...
     initSemaphore(&g_sem);//得到一个信号量
+    g_sem.init(g_sem.this,"sem", 0);//初始化信号量
     ...
     g_sem.destroy();//使用完成之后要销毁这个信号量
 }

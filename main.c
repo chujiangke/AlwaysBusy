@@ -55,9 +55,11 @@ void *costumer(void *arg){
 
 int main() {
     //获取信号量
-    g_sem = getSemaphore();
+    g_sem = get_semaphore();
     //初始化信号量
     g_sem->init(g_sem->this,"sem", 0);
+    //打印信号量名字
+    printf("sem name:%s\n",g_sem->name);
     //设置随机数种子
     srand((unsigned)time(NULL));
     //初始化互斥锁

@@ -2,18 +2,26 @@
 #include <mutex>
 #include <list>
 #include "ThreadsManager.h"
+#include <opencv2/opencv.hpp>
 
-class Point{
+using namespace cv;
+
+class Data{
 public:
-    Point(int xx,int yy):x(xx),y(yy),z(0){};
-    int index = 0;
+    Data(int xx,int yy):x(xx),y(yy),z(0){
+        m = new Mat(1,1,CV_32SC1);
+    };
+    void release(){
+        delete m;
+    }
     int x;
     int y;
     int z;
+    Mat *m;
 };//要处理的数据的类型定义，我这里是处理点
 
 std::mutex mCout;                   //打印互斥锁
-ThreadsManager<Point> *manager;  //线程管理器
+ThreadsManager<Data> *manager;  //线程管理器
 
 /**
  * 在子线程执行的函数模板
@@ -30,9 +38,9 @@ void callback(int i){
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
 //        mCout.lock();
-        Point point= manager->next();
-        point.z = point.x + point.y;
-        manager->set(point);
+        Data *point= manager->next();
+        point->z = point->x + point->y;
+        point->m->at<int>(0,0) = 100;
 //        printf("Position:%d(%d,%d,%d)\n",point.index,point.x,point.y,point.z);
 //        point = nullptr;
 //        mCout.unlock();
@@ -40,23 +48,23 @@ void callback(int i){
 }
 
 void demo(){
-    manager = new ThreadsManager<Point>(4);  //新建线程管理对象
+    manager = new ThreadsManager<Data>(4);  //新建线程管理对象
     manager->create(callback);                  //创建线程
     for(int i=0;i<5;i++){                       //添加点
         for(int j=0;j<5;j++){
-           manager->add(Point(i,j));
+           manager->add(Data(i,j));
         }
     }
     manager->join();                    //等待处理完所有points里面的数据
     std::cout << "emmm" << std::endl;
     for(ulong i=0;i<manager->size();i++){
         auto p = manager->get(i);
-        printf("(%d %d %d)\n",p.x,p.y,p.z);
+        printf("(%d %d %d %d)\n",p.x,p.y,p.z,p.m->at<int>(0,0));
     }
     manager->clear();//清除旧的数据
     for(int i=5;i<10;i++){              //再次添加点
         for(int j=5;j<10;j++){
-            manager->add(Point(i,j));
+            manager->add(Data(i,j));
         }
     }
     manager->join();                    //等待处理完
@@ -68,7 +76,7 @@ void demo(){
     manager->clear();//清除旧的数据
     for(int i=10;i<15;i++){             //再次添加数据
         for(int j=10;j<15;j++){
-            manager->add(Point(i,j));
+            manager->add(Data(i,j));
         }
     }
     manager->kill();//退出线程

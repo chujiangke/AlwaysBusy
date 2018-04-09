@@ -3,11 +3,14 @@ project(AlwaysBusy)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(lib)
+find_package(OpenCV REQUIRED)
 
-set(HEADERS lib/Semaphore.h lib/ThreadsManager.h)
-set(SOURCES main.cpp)
+include_directories(lib)
+include_directories(${OPENCV_INCLUDE_DIRS})
+
+file(GLOB HEADERS lib/*.h)
+file(GLOB SOURCES main.cpp lib/*.cpp)
 
 add_executable(AlwaysBusy ${HEADERS} ${SOURCES})
 
-target_link_libraries(AlwaysBusy pthread)
+target_link_libraries(AlwaysBusy pthread ${OpenCV_LIBS})

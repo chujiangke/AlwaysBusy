@@ -62,6 +62,7 @@ void demo(){
     for(ulong i=0;i<manager->size();i++){
         auto p = manager->get(i);
         printf("(%d %d %d %d)\n",p.x,p.y,p.z,p.m->at<int>(0,0));
+        p.release();
     }
     manager->clear();//清除旧的数据
     for(int i=5;i<10;i++){              //再次添加点

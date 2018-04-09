@@ -129,7 +129,7 @@ public:
      * 返回链表中的下一个数据
      * @return 数据
      */
-    T *next(){
+    T next(){
         int index=0;
         _mutex_data_vector.lock();
         if(_data_pointer < _data_vector.size()){
@@ -137,7 +137,9 @@ public:
             _data_pointer++;
         }
         _mutex_data_vector.unlock();
-        return &(_data_vector[index]);
+        T data = _data_vector[index];
+        data.index = index;
+        return data;
     }
     /**
      * 清空数据链表
@@ -157,6 +159,13 @@ public:
     T get(int index){
         if(index<_data_vector.size())
             return _data_vector[index];
+        else
+            throw std::out_of_range("index is out of range");
+    }
+
+    void set(T data){
+        if(data.index<_data_vector.size())
+            _data_vector[data.index] = data;
         else
             throw std::out_of_range("index is out of range");
     }

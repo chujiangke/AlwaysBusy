@@ -14,6 +14,7 @@ public:
     void release(){
         delete m;
     }
+    int index=0;
     int x;
     int y;
     int z;
@@ -38,9 +39,10 @@ void callback(int i){
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
 //        mCout.lock();
-        Data *point= manager->next();
-        point->z = point->x + point->y;
-        point->m->at<int>(0,0) = 100;
+        Data point= manager->next();
+        point.z = point.x + point.y;
+        point.m->at<int>(0,0) = 100;
+        manager->set(point);
 //        printf("Position:%d(%d,%d,%d)\n",point.index,point.x,point.y,point.z);
 //        point = nullptr;
 //        mCout.unlock();

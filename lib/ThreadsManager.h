@@ -146,7 +146,7 @@ public:
 #ifdef _WIN32
         SYSTEM_INFO si;
         GetSystemInfo(&si);
-        count = si.dwNumberOfProcessors;
+        count = (int)si.dwNumberOfProcessors;
 #else
         count = static_cast<int>(sysconf(_SC_NPROCESSORS_CONF));
 #endif

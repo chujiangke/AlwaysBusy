@@ -48,7 +48,7 @@ public:
 
     /**
      * 创建线程
-     * @param f 线程函数
+     * @param f 线程回调函数
      * @return
      */
     void create(void (*f)(int)) {
@@ -119,8 +119,8 @@ public:
     }
 
     /**
-     * 返回链表中的下一个数据
-     * @return 数据
+     * 返回下一个数据的指针
+     * @return 数据指针
      */
     T *next(){
         int index=0;
@@ -132,8 +132,9 @@ public:
         _mutex_data_vector.unlock();
         return  _data_array.ptr(index);
     }
+
     /**
-     * 清空数据链表
+     * 清空数据
      */
     void clear(){
         _mutex_data_vector.lock();
@@ -143,9 +144,9 @@ public:
     }
 
     /**
-     * 返回数据
-     * @param index
-     * @return
+     * 返回第index个数据
+     * @param index 索引
+     * @return 数据
      */
     T get(size_t index){
         if(index<_data_array.size())
@@ -167,7 +168,7 @@ public:
     }
 
     /**
-     * 返回数据vector大小
+     * 返回数据的个数
      * @return 大于0整数
      */
     ulong size(){

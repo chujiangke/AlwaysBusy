@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "Semaphore.h"
+#include "Array.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -26,19 +27,23 @@ public:
      * 线程管理器的构造函数
      * @param count 线程总数
      */
-    explicit ThreadsManager(int count):_run_or_not(true) {
-        assert(count>0 && count<getCoreCount());
+    explicit ThreadsManager(size_t count):_run_or_not(true) {
+        if(count<1 || count>getCoreCount()){
+            throw std::runtime_error("线程数量超过核心数量");
+        }
         _max_thread_count = count;
         _running_thread = count;
-        _semaphore = new SEM::Semaphore("_semaphore",0);
-        assert(_semaphore != nullptr);
+        _semaphore = new SEM::Semaphore("semaphore",0);
+        if(_semaphore == nullptr){
+            throw std::runtime_error("新建信号量失败");
+        }
         _data_pointer = 0;
     }
 
     ~ThreadsManager() {
         if(_semaphore != nullptr)
             delete _semaphore;
-        _data_vector.clear();
+        _data_array.clear();
     }
 
     /**
@@ -108,38 +113,24 @@ public:
      */
     void add(T data) {
         _mutex_data_vector.lock();
-        _data_vector.emplace_back(data);
+        _data_array.push(data);
         _mutex_data_vector.unlock();
         signal();
-    }
-
-    /**
-     * 取出数据
-     * @return  数据
-     */
-    T pop() {
-        _mutex_data_vector.lock();
-        T data = _data_vector.front();        //取出第一个
-        _data_vector.erase(_data_vector.begin());    //删除第一个
-        _mutex_data_vector.unlock();
-        return data;
     }
 
     /**
      * 返回链表中的下一个数据
      * @return 数据
      */
-    T next(){
+    T *next(){
         int index=0;
         _mutex_data_vector.lock();
-        if(_data_pointer < _data_vector.size()){
+        if(_data_pointer < _data_array.size()){
             index = _data_pointer;
             _data_pointer++;
         }
         _mutex_data_vector.unlock();
-        T data = _data_vector[index];
-        data.index = index;
-        return data;
+        return  _data_array.ptr(index);
     }
     /**
      * 清空数据链表
@@ -147,7 +138,7 @@ public:
     void clear(){
         _mutex_data_vector.lock();
         _data_pointer = 0;
-        _data_vector.clear();
+        _data_array.clear();
         _mutex_data_vector.unlock();
     }
 
@@ -156,16 +147,16 @@ public:
      * @param index
      * @return
      */
-    T get(int index){
-        if(index<_data_vector.size())
-            return _data_vector[index];
+    T get(size_t index){
+        if(index<_data_array.size())
+            return _data_array.get(index);
         else
             throw std::out_of_range("index is out of range");
     }
 
     void set(T data){
-        if(data.index<_data_vector.size())
-            _data_vector[data.index] = data;
+        if(data.index<_data_array.size())
+            _data_array.set(data.index,data);
         else
             throw std::out_of_range("index is out of range");
     }
@@ -175,7 +166,7 @@ public:
      * @return 大于0整数
      */
     ulong size(){
-        return _data_vector.size();
+        return _data_array.size();
     }
 
     /**
@@ -196,14 +187,14 @@ public:
     }
 
 private:
-    int                         _max_thread_count;  //线程数量
-    int                         _running_thread;    //正在运行的线程数量
+    size_t                      _max_thread_count;  //线程数量
+    size_t                      _running_thread;    //正在运行的线程数量
     std::mutex                  _mutex;             //_running的互斥锁
     std::vector<std::thread>    _threads;           //线程数组容器
     SEM::Semaphore              *_semaphore;        //同步线程的信号量
     bool                        _run_or_not;        //是否继续运行子线程
 
-    std::vector<T>              _data_vector;       //数据向量
+    Array<T>                    _data_array;        //数据向量
     std::mutex                  _mutex_data_vector; //数据向量互斥锁
     int                         _data_pointer;      //下一个访问的数据位置
 };

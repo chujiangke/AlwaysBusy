@@ -202,6 +202,7 @@ private:
     std::vector<std::thread>    _threads;           //线程数组容器
     SEM::Semaphore              *_semaphore;        //同步线程的信号量
     bool                        _run_or_not;        //是否继续运行子线程
+
     std::vector<T>              _data_vector;       //数据向量
     std::mutex                  _mutex_data_vector; //数据向量互斥锁
     int                         _data_pointer;      //下一个访问的数据位置

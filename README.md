@@ -69,6 +69,11 @@ for(int i=0;i<5;i++){
 }
 //等待处理完所有数据
 manager->join();
+//获取子线程处理完的数据
+for(int i=0;i<manager->size();i++){ 
+    auto p = manager->get(i);
+    printf("(%d+%d=%d)\n",p.x,p.y,p.z);
+}
 //必须手动清空数据
 manager->clear();
 //杀死所有子线程

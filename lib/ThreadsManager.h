@@ -154,9 +154,14 @@ public:
             throw std::out_of_range("index is out of range");
     }
 
-    void set(T data){
-        if(data.index<_data_array.size())
-            _data_array.set(data.index,data);
+    /**
+     * 用data更新index处的数据
+     * @param index 索引
+     * @param data 数据
+     */
+    void set(size_t index,T data){
+        if(index<_data_array.size())
+            _data_array.set(index,data);
         else
             throw std::out_of_range("index is out of range");
     }

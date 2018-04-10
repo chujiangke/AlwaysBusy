@@ -12,6 +12,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8a9792b6-16e1-4163-b7c3-130c74a3ca94" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/AlwaysBusy.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -29,7 +33,7 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1392">
+            <state relative-caret-position="1464">
               <caret line="61" column="38" selection-start-line="61" selection-start-column="38" selection-end-line="61" selection-end-column="38" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
@@ -43,7 +47,7 @@
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
               <first_editor relative-caret-position="72">
-                <caret line="3" column="27" selection-start-line="3" selection-start-column="27" selection-end-line="3" selection-end-column="27" />
+                <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
               </first_editor>
               <second_editor />
             </state>
@@ -53,7 +57,7 @@
       <file leaf-file-name="Semaphore.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/Semaphore.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1776">
+            <state relative-caret-position="1896">
               <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
               <folding>
                 <element signature="e#60#76#0" expanded="true" />
@@ -65,7 +69,7 @@
       <file leaf-file-name="ThreadsManager.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/ThreadsManager.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
+            <state relative-caret-position="-3120">
               <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
               <folding>
                 <element signature="e#182#239#0" expanded="true" />
@@ -316,7 +320,8 @@
       <workItem from="1523235866376" duration="2732000" />
       <workItem from="1523239279916" duration="3772000" />
       <workItem from="1523347504756" duration="8556000" />
-      <workItem from="1523358498858" duration="1800000" />
+      <workItem from="1523358498858" duration="2122000" />
+      <workItem from="1523360627759" duration="110000" />
     </task>
     <task id="LOCAL-00001" summary="2">
       <created>1516533826731</created>
@@ -658,7 +663,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="84442000" />
+    <option name="totallyTimeSpent" value="84874000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -673,16 +678,15 @@
     <frame x="57" y="-4" width="1623" height="1054" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14107366" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14107366" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49750313" weight="0.32939914" />
-      <window_info anchor="bottom" id="Messages" order="7" sideWeight="0.7066167" weight="0.3236559" />
       <window_info anchor="bottom" id="CMake" order="7" sideWeight="0.5967541" weight="0.32795697" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.505618" side_tool="true" weight="0.32903227" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.54057425" weight="0.29050925" />
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.48938826" weight="0.29166666" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="7" sideWeight="0.48938826" visible="true" weight="0.29139784" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49438202" weight="0.3287037" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.46941322" visible="true" weight="0.42903227" />
+      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49438202" weight="0.32795697" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.46941322" weight="0.42903227" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -691,6 +695,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4993758" weight="0.32903227" />
+      <window_info anchor="bottom" id="Messages" order="7" sideWeight="0.7066167" weight="0.3236559" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -896,13 +901,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/Array.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="28" column="18" selection-start-line="28" selection-start-column="18" selection-end-line="28" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/Array.h" />
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
@@ -912,7 +911,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/Semaphore.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1776">
+        <state relative-caret-position="1896">
           <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
           <folding>
             <element signature="e#60#76#0" expanded="true" />
@@ -920,22 +919,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/ThreadsManager.h">
+    <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+        <state relative-caret-position="1464">
+          <caret line="61" column="38" selection-start-line="61" selection-start-column="38" selection-end-line="61" selection-end-column="38" />
           <folding>
-            <element signature="e#182#239#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
+    <entry file="file://$PROJECT_DIR$/lib/ThreadsManager.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1392">
-          <caret line="61" column="38" selection-start-line="61" selection-start-column="38" selection-end-line="61" selection-end-column="38" />
+        <state relative-caret-position="-3120">
+          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#182#239#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -944,7 +943,7 @@
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="72">
-            <caret line="3" column="27" selection-start-line="3" selection-start-column="27" selection-end-line="3" selection-end-column="27" />
+            <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
           </first_editor>
           <second_editor />
         </state>

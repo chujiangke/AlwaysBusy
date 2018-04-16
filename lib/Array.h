@@ -1,12 +1,17 @@
 /**
- * Array是一个模板类,作用类似于一个vector，但是只实现了部分函数。
+ * 1.Array是一个模板类,作用类似于一个vector，但是只实现了部分函数。
  * 最大的特点是在多线程环境下通过指针访问数组的元素的是安全的，不会
  * 像vector一样出现非法指针，详见博客：
- * 设计思想是，每当向Array数组的末尾push一个元素时，不是直接将数
+ * https://blog.csdn.net/DumpDoctorWang/article/details/79966945
+ *
+ * 2.设计思想是，每当向Array数组的末尾push一个元素时，不是直接将数
  * 据本身放进数据容器，而是new一块空间，把数据的值放进去，由于new
  * 的空间需要手动释放才会失效，因此通过指针访问数组的元素时，除非手
  * 动释放了空间，都不会出现异常。然后将新分配空间的指针存储在vector
  * 里，这样就可以通过指针访问数组元素。这部分详见push()的实现。
+ *
+ * 3.使用多线程时，在包含此文件之间定义宏MULTI_THREAD，使用这个类
+ * 就是线程安全的。
  */
 
 #ifndef MY_ARRAY_H
@@ -14,6 +19,10 @@
 
 #include <vector>
 #include <stdexcept>
+
+#ifdef  MULTI_THREAD
+#include <mutex>
+#endif
 
 template<typename T>
 class Array {
@@ -29,6 +38,9 @@ public:
     void push(T &elem) {
         auto node = new T;  //分配空间
         (*node) = elem;     //赋值
+#ifdef MULTI_THREAD
+        std::lock_guard<std::mutex> lock(_mutex);
+#endif
         _pointer_vector.push_back(node);//存下指针
     }
 
@@ -38,6 +50,9 @@ public:
      * @return 指针
      */
     T* ptr(std::size_t index) {
+#ifdef MULTI_THREAD
+        std::lock_guard<std::mutex> lock(_mutex);
+#endif
         if (index < _pointer_vector.size()) {
             return _pointer_vector[index];
         } else {
@@ -52,6 +67,9 @@ public:
      * @return 第index个元素的引用
      */
     T& operator[](std::size_t index){
+#ifdef MULTI_THREAD
+        std::lock_guard<std::mutex> lock(_mutex);
+#endif
         if (index < _pointer_vector.size()) {
             return *(_pointer_vector[index]);
         } else {
@@ -66,12 +84,7 @@ public:
      * @return 元素
      */
     T get(std::size_t index) {
-        if (index < _pointer_vector.size()) {
-            return *(_pointer_vector[index]);
-        } else {
-            clear();//释放内存
-            throw std::out_of_range("Array::get():index超出范围");
-        }
+        return (*this)[index];
     }
 
     /**
@@ -80,18 +93,16 @@ public:
      * @param elem 元素
      */
     void set(std::size_t index, T elem) {
-        if (index < _pointer_vector.size()) {
-            *(_pointer_vector[index]) = elem;
-        } else {
-            clear();//释放内存
-            throw std::out_of_range("Array::set():index超出范围");
-        }
+        (*this)[index] = elem;
     }
 
     /**
      * 清空所有元素，并释放内存
      */
     void clear() {
+#ifdef MULTI_THREAD
+        _mutex.unlock();
+#endif
         for (std::size_t i = 0; i < _pointer_vector.size(); i++) {
             delete _pointer_vector[i];
         }
@@ -103,11 +114,17 @@ public:
      * @return 大于等于0的数
      */
     size_t size() {
+#ifdef MULTI_THREAD
+        std::lock_guard<std::mutex> lock(_mutex);
+#endif
         return _pointer_vector.size();
     }
 
 private:
     std::vector<T *> _pointer_vector;
+#ifdef MULTI_THREAD
+    std::mutex _mutex;
+#endif
 };
 
 #endif //MY_ARRAY_H

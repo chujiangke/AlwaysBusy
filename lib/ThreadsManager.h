@@ -150,7 +150,7 @@ public:
      */
     T get(size_t index){
         if(index<_data_array.size())
-            return _data_array.get(index);
+            return _data_array[index];
         else
             throw std::out_of_range("index is out of range");
     }

@@ -48,7 +48,7 @@ void callback(ThreadsManager<Data> *m, int i){
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
         //取指针
-        Data *point= manager->next();
+        Data *point= m->next();
         //做加法
         point->z = point->x + point->y;
     }

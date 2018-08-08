@@ -29,7 +29,7 @@ void callback(ThreadsManager<Data> *m, int i){
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
         //取指针
-        Data *point= manager->next();
+        Data *point= m->next();
         //做加法
         point->z = point->x + point->y;
     }
@@ -81,8 +81,30 @@ void demo(){
     delete manager;
 }
 
+void demo1(bool kill){
+    static ThreadsManager<Data> manager1(callback,12);
+    //第一轮添加数据
+    for(int i=0;i<5;i++){
+        for(int j=0;j<5;j++){
+            manager1.add(Data(i,j));
+        }
+    }
+    manager1.join();
+    //获取子线程处理之后的数据
+    std::cout << "****************************" << std::endl;
+    for(ulong i=0;i<manager1.size();i++){
+        auto p = manager1.get(i);
+        printf("(%d+%d=%d)\n",p.x,p.y,p.z);
+    }
+    //必须清除旧的数据
+    manager1.clear();
+    if(kill)
+        manager1.kill();
+}
 
 int main() {
-    demo();
+//    demo();
+    demo1(false);
+    demo1(true);
     return 0;
 }

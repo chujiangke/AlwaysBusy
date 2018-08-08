@@ -105,6 +105,7 @@ void demo1(bool kill){
 int main() {
 //    demo();
     demo1(false);
+    demo1(false);
     demo1(true);
     return 0;
 }

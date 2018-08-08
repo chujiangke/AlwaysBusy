@@ -9,7 +9,7 @@ CPU逻辑核心数）在后台驻留的子线程。ThreadManager的实例会维�
 待数据，直到主线程通知退出。
 
 ## 三、使用简介
-1. 点击[链接](https://codeload.github.com/Mannix1994/AlwaysBusy/zip/pointer),
+1. 点击[链接](https://codeload.github.com/Mannix1994/AlwaysBusy/zip/ptr_no_create),
 下载本项目，然后将压缩包中的lib文件夹拷贝到你的项目中。
 
 2. 在代码中定义要在子线程中处理的数据结构，可以是任何类型的数据
@@ -39,16 +39,16 @@ ThreadsManager<Data> *manager;  //线程管理器
  * 在子线程执行的函数模板
  * @param i 子线程的的id，范围是0~n-1
  */
-void callback(int i){
+void callback(ThreadsManager<Data> *m, int i){
     while(true){
-        manager->wait();    //有资源的话会立即返回，没有资源会阻塞
-        if(!manager->run()){//是否继续运行子线程
+        m->wait();    //有资源的话会立即返回，没有资源会阻塞
+        if(!m->run()){//是否继续运行子线程
             break;
         }
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
-        //取数据指针
-        Data *point= manager->next();//获取下一个未处理的元素的指针
+        //取指针
+        Data *point= manager->next();
         //做加法
         point->z = point->x + point->y;
     }
@@ -57,28 +57,50 @@ void callback(int i){
 
 5. 在主程序中编写下列代码
 ```cplusplus
-//新建线程管理对象，参数为子线程数量。
-manager = new ThreadsManager<Position>(4);
-//创建线程，参数为上一步定义的回调函数
-manager->create(callback);
-//添加待处理数据
-for(int i=0;i<5;i++){
-    for(int j=0;j<5;j++){
-       manager->add(Data(i,j));
+void demo(){
+    //新建线程管理对象
+    manager = new ThreadsManager<Data>(callback, 12);
+
+    //第一轮添加数据
+    for(int i=0;i<5;i++){
+        for(int j=0;j<5;j++){
+           manager->add(Data(i,j));
+        }
     }
+    //等待处理完所有points里面的数据
+    manager->join();
+    //获取子线程处理完的数据
+    std::cout << "****************************" << std::endl;
+    for(ulong i=0;i<manager->size();i++){
+        auto p = manager->get(i);
+        printf("(%d+%d=%d)\n",p.x,p.y,p.z);
+    }
+    //必须清除旧的数据
+    manager->clear();
+
+
+    //第二轮添加数据
+    for(int i=5;i<10;i++){
+        for(int j=5;j<1000;j++){
+            manager->add(Data(i,j));
+        }
+    }
+    //等待处理完
+    manager->join();
+    //获取子线程处理完的数据
+    std::cout << "****************************" << std::endl;
+    for(int i=0;i<manager->size();i++){ //打印数据
+        auto p = manager->get(i);
+    }
+    //必须清除旧的数据
+    manager->clear();
+
+    //退出线程
+    manager->kill();
+
+    std::cout << "Hello, World!" << std::endl;
+    delete manager;
 }
-//等待处理完所有数据
-manager->join();
-//获取子线程处理完的数据
-for(int i=0;i<manager->size();i++){ 
-    auto p = manager->get(i);
-    printf("(%d+%d=%d)\n",p.x,p.y,p.z);
-}
-//必须手动清空数据
-manager->clear();
-//杀死所有子线程
-manager->kill();
-delete manager;
 ```
 
 完整的demo在main.cpp中，看那个更加完整易懂。

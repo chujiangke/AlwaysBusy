@@ -26,8 +26,6 @@ void callback(ThreadsManager<Data> *m, int i){
         if(!m->run()){//是否继续运行子线程
             break;
         }
-        //取点
-
         //处理数据，可以自定义的部分
         SLEEP(i*100);//休眠一段时间,代表处理数据时间
         //取指针

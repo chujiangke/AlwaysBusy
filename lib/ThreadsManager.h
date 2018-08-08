@@ -12,9 +12,7 @@
 #include <windows.h>
 #define SLEEP(x)  (Sleep(x)) //休眠xms
 #else
-
 #include <unistd.h>
-
 #define SLEEP(x) (usleep((x*100))) //休眠x*100us
 #endif
 
@@ -22,7 +20,6 @@ template<typename T>
 class ThreadsManager {
 
 public:
-    typedef typename std::vector<T>::iterator Iterator;
 
     /**
      * 线程管理器的构造函数

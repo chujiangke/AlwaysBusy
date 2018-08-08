@@ -67,9 +67,9 @@ void demo(){
            manager->add(Data(i,j));
         }
     }
-    //等待处理完所有points里面的数据
+    //等待处理完所有的数据
     manager->join();
-    //获取子线程处理完的数据
+    //获取子线程处理之后的数据
     std::cout << "****************************" << std::endl;
     for(ulong i=0;i<manager->size();i++){
         auto p = manager->get(i);
@@ -77,8 +77,7 @@ void demo(){
     }
     //必须清除旧的数据
     manager->clear();
-
-
+    
     //第二轮添加数据
     for(int i=5;i<10;i++){
         for(int j=5;j<1000;j++){
@@ -87,7 +86,7 @@ void demo(){
     }
     //等待处理完
     manager->join();
-    //获取子线程处理完的数据
+    //获取子线程处理之后的数据
     std::cout << "****************************" << std::endl;
     for(int i=0;i<manager->size();i++){ //打印数据
         auto p = manager->get(i);

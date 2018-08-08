@@ -1,3 +1,6 @@
+/**
+ * 本分支由pointer分支演化而来，删除了ThreadsManager::create函数
+ */
 #include <iostream>
 #include "ThreadsManager.h"
 
@@ -17,10 +20,10 @@ ThreadsManager<Data> *manager;  //线程管理器
  * 在子线程执行的函数模板
  * @param i 子线程的的id，范围是0~n-1
  */
-void callback(int i){
+void callback(ThreadsManager<Data> *m, int i){
     while(true){
-        manager->wait();    //有资源的话会立即返回，没有资源会阻塞
-        if(!manager->run()){//是否继续运行子线程
+        m->wait();    //有资源的话会立即返回，没有资源会阻塞
+        if(!m->run()){//是否继续运行子线程
             break;
         }
         //取点
@@ -36,9 +39,7 @@ void callback(int i){
 
 void demo(){
     //新建线程管理对象
-    manager = new ThreadsManager<Data>(12);
-    //创建线程
-    manager->create(callback);
+    manager = new ThreadsManager<Data>(callback, 12);
 
     //第一轮添加数据
     for(int i=0;i<5;i++){
@@ -60,7 +61,7 @@ void demo(){
 
     //第二轮添加数据
     for(int i=5;i<10;i++){
-        for(int j=5;j<10;j++){
+        for(int j=5;j<1000;j++){
             manager->add(Data(i,j));
         }
     }
@@ -70,7 +71,7 @@ void demo(){
     std::cout << "****************************" << std::endl;
     for(int i=0;i<manager->size();i++){ //打印数据
         auto p = manager->get(i);
-        printf("(%d+%d=%d)\n",p.x,p.y,p.z);
+//        printf("(%d+%d=%d)\n",p.x,p.y,p.z);
     }
     //必须清除旧的数据
     manager->clear();

@@ -1,35 +1,41 @@
 #include <iostream>
 #include <thread>
+#include <vector>
 
 using namespace std;
 
 class Position {
 public:
-    Position(int xx, int yy) : x(xx), y(yy) {};
-    int x;
-    int y;
+    Position(int xx, int yy) : _x(xx), _y(yy) {};
+    int& x(){ return _x; }
+    int& y(){ return _y; }
 
     void member_func(int i) {
         printf("member_func:%d\n", i);
-        x = 100;
+        _x = 100;
     }
 
     friend void pointer_style(Position *p, int i);
-
     friend void reference_style(Position &p, int i);
+
+private:
+    int _x;
+    int _y;
 };
 
+//! 友元函数，通过指针来传递类的实例
 void pointer_style(Position *p, int i) {
-    printf("pointer_style:%d(%d,%d)\n", i, p->x, p->y);
-    p->x = 200;
+    printf("pointer_style:%d(%d,%d)\n", i, p->_x, p->_y);
+    p->_x = 200;
 }
 
+//! 友元函数，通过引用来访问类的实例
 void reference_style(Position &p, int i) {
-    printf("reference_style:%d(%d,%d)\n", i, p.x, p.y);
-    p.x = 300;
+    printf("reference_style:%d(%d,%d)\n", i, p._x, p._y);
+    p._x = 300;
 }
 
-int main() {
+void demo() {
     Position p(1, 2);
 
     /**
@@ -40,7 +46,7 @@ int main() {
 
     thread t1(&Position::member_func, p, 233);
     t1.join();
-    cout << "p.x=" << p.x << endl;
+    cout << "p.x=" << p.x() << endl;
 
     /**
      * 2、使用类的友元函数作为参数
@@ -51,7 +57,7 @@ int main() {
      */
     std::thread t2(reference_style, ref(p), 1);
     t2.join();
-    cout << "p.x=" << p.x << endl;
+    cout << "p.x=" << p.x() << endl;
 
     /**
      * 3、使用类的友元函数作为参数
@@ -61,15 +67,15 @@ int main() {
      */
     std::thread t3(pointer_style, &p, 1);
     t3.join();
-    cout << "p.x=" << p.x << endl;
+    cout << "p.x=" << p.x() << endl;
 
     /**
      * 4、通过lambda传递引用参数
      * 关于lambda函数的说明:https://blog.csdn.net/u010984552/article/details/53634513
      */
     auto lambda_func = [&p](int i) -> void {
-        printf("lambda_func:%d(%d,%d)\n", i, p.x, p.y);
-        p.x = 400;
+        printf("lambda_func:%d(%d,%d)\n", i, p.x(), p.y());
+        p.x() = 400;
     };
     /**
      * 参数说明：参数1是lambda表达式,参数2是传递给lambda表达式的参数
@@ -79,7 +85,45 @@ int main() {
      */
     thread t4(lambda_func, 123);
     t4.join();
-    cout << "p.x=" << p.x << endl;
+    cout << "p.x=" << p.x() << endl;
+}
 
+class M{
+private:
+    vector<int> numbers;
+    vector<thread> ts;
+public:
+    /**
+     * 构造函数
+     * @param thread_count 线程数量
+     */
+    M(const int thread_count){
+        numbers.resize(thread_count); // 调整数字容量
+        //! 定义lambda函数，捕获类的成员和变量，作为thread的参数，
+        //! 这样，就可以在子线程里访问类的成员。
+        auto lambda_fun = [&](int i) -> void {
+            this->numbers[i] = i;
+
+            for(int j=0;j<10000;j++);
+        };
+
+        //! 创建线程
+        for(int i=0;i<thread_count;i++){
+            ts.push_back(thread(lambda_fun,i));
+        }
+        //! 等待子线程结束
+        for(int i=0;i<thread_count;i++){
+            ts[i].join();
+        }
+        //! 打印结果
+        for(int i=0;i<thread_count;i++){
+            printf("numbers[%d]=%d\n", i, this->numbers[i]);
+        }
+    }
+};
+
+int main(){
+    demo();
+    M m(12);
     return 0;
 }

@@ -12,7 +12,9 @@
 #include <windows.h>
 #define SLEEP(x)  (Sleep(x)) //休眠xms
 #else
+
 #include <unistd.h>
+
 #define SLEEP(x) (usleep((x*100))) //休眠x*100us
 #endif
 
@@ -26,7 +28,8 @@ public:
      * @param count 线程总数
      * @param f 线程回调函数
      */
-    explicit ThreadsManager(void (*f)(ThreadsManager<T>*,int), size_t count) : _run_or_not(true) {
+    template <typename F>
+    explicit ThreadsManager(F const &f, size_t count) : _run_or_not(true) {
         if (count < 1 || count > getCoreCount()) {
             throw std::runtime_error("线程数量超过核心数量");
         }
@@ -39,7 +42,7 @@ public:
         _data_pointer = 0;
         // 创建线程
         for (int i = 0; i < _max_thread_count; i++) {
-            _threads.push_back(std::thread(f,this ,i));
+            _threads.push_back(std::thread(f, this, i));
         }
     }
 
@@ -188,7 +191,7 @@ private:
     size_t _max_thread_count;  //线程数量
     size_t _running_thread;    //正在运行的线程数量
     std::mutex _mutex;             //_running的互斥锁
-    std::vector<std::thread> _threads;           //线程数组容器
+    std::vector <std::thread> _threads;           //线程数组容器
     SEM::Semaphore *_semaphore;        //同步线程的信号量
     bool _run_or_not;        //是否继续运行子线程
 

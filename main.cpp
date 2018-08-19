@@ -1,6 +1,6 @@
 /**
- * 本分支由pointer分支演化而来，删除了ThreadsManager::create函数
- */
+ * 本分支由ptr_no_create分支演化而来，打算使用lambda函数作为参数
+*/
 #include <iostream>
 #include "ThreadsManager.h"
 
@@ -14,75 +14,25 @@ public:
     int z;//存储子线程中计算的结果
 };//要处理的数据的类型定义
 
-ThreadsManager<Data> *manager;  //线程管理器
-
-/**
- * 在子线程执行的函数模板
- * @param i 子线程的的id，范围是0~n-1
- */
-void callback(ThreadsManager<Data> *m, int i){
-    while(true){
-        m->wait();    //有资源的话会立即返回，没有资源会阻塞
-        if(!m->run()){//是否继续运行子线程
-            break;
-        }
-        //处理数据，可以自定义的部分
-        SLEEP(i*100);//休眠一段时间,代表处理数据时间
-        //取指针
-        Data *point= m->next();
-        //做加法
-        point->z = point->x + point->y;
-    }
-}
-
-void demo(){
-    //新建线程管理对象
-    manager = new ThreadsManager<Data>(callback, 12);
-
-    //第一轮添加数据
-    for(int i=0;i<5;i++){
-        for(int j=0;j<5;j++){
-           manager->add(Data(i,j));
-        }
-    }
-    //等待处理完所有的数据
-    manager->join();
-    //获取子线程处理之后的数据
-    std::cout << "****************************" << std::endl;
-    for(ulong i=0;i<manager->size();i++){
-        auto p = manager->get(i);
-        printf("(%d+%d=%d)\n",p.x,p.y,p.z);
-    }
-    //必须清除旧的数据
-    manager->clear();
-
-
-    //第二轮添加数据
-    for(int i=5;i<10;i++){
-        for(int j=5;j<1000;j++){
-            manager->add(Data(i,j));
-        }
-    }
-    //等待处理完
-    manager->join();
-    //获取子线程处理之后的数据
-    std::cout << "****************************" << std::endl;
-    for(int i=0;i<manager->size();i++){ //打印数据
-        auto p = manager->get(i);
-//        printf("(%d+%d=%d)\n",p.x,p.y,p.z);
-    }
-    //必须清除旧的数据
-    manager->clear();
-
-    //退出线程
-    manager->kill();
-
-    std::cout << "Hello, World!" << std::endl;
-    delete manager;
-}
-
 void demo1(bool kill){
-    static ThreadsManager<Data> manager1(callback,12);
+    int a[13] = {0};
+    static auto func = [&](ThreadsManager<Data> *m,int i)->void {
+        while(true){
+            m->wait();    //有资源的话会立即返回，没有资源会阻塞
+            if(!m->run()){//是否继续运行子线程
+                break;
+            }
+            //处理数据，可以自定义的部分
+            SLEEP(i*100);//休眠一段时间,代表处理数据时间
+            //取指针
+            Data *point= m->next();
+            //做加法
+            point->z = point->x + point->y;
+
+            a[i] = i;
+        }
+    };
+    static ThreadsManager<Data> manager1(func,12);
     //第一轮添加数据
     for(int i=0;i<5;i++){
         for(int j=0;j<5;j++){
@@ -95,6 +45,10 @@ void demo1(bool kill){
     for(ulong i=0;i<manager1.size();i++){
         auto p = manager1.get(i);
         printf("(%d+%d=%d)\n",p.x,p.y,p.z);
+    }
+    //打印a
+    for(ulong i=0;i<13;i++){
+        printf("a[%ld]=%d\n",i,a[i]);
     }
     //必须清除旧的数据
     manager1.clear();

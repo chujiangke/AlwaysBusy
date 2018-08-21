@@ -23,7 +23,8 @@ void demo1(bool kill){
                 break;
             }
             //处理数据，可以自定义的部分
-            SLEEP(i*100);//休眠一段时间,代表处理数据时间
+
+            std::this_thread::sleep_for(std::chrono::microseconds(100*100));//休眠一段时间,代表处理数据时间
             //取指针
             Data *point= m->next();
             //做加法

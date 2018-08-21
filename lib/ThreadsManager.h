@@ -4,19 +4,10 @@
 #include <thread>
 #include <vector>
 #include <stdexcept>
-
+#include <chrono>
 #include "Semaphore.h"
 #include "Array.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#define SLEEP(x)  (Sleep(x)) //休眠xms
-#else
-
-#include <unistd.h>
-
-#define SLEEP(x) (usleep((x*100))) //休眠x*100us
-#endif
 
 template<typename T>
 class ThreadsManager {
@@ -65,9 +56,11 @@ public:
      * 等待所有子线程阻塞
      */
     void join() {
-        SLEEP(5);//休眠500us,等待被唤醒的线程启动
+        //休眠500us,等待被唤醒的线程启动
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
         while (_running_thread != 0) {
-            SLEEP(1);//休眠500us之后再查询有无进程再运行
+            //休眠100us之后再查询有无进程再运行
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
     }
 
@@ -176,15 +169,7 @@ public:
      * @return 核心数量
      */
     static int getCoreCount() {
-        int count = 1; // 至少一个
-#ifdef _WIN32
-        SYSTEM_INFO si;
-        GetSystemInfo(&si);
-        count = si.dwNumberOfProcessors;
-#else
-        count = static_cast<int>(sysconf(_SC_NPROCESSORS_CONF));
-#endif
-        return count;
+        return std::thread::hardware_concurrency();;
     }
 
 private:
